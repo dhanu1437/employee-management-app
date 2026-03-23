@@ -1,0 +1,132 @@
+/* 🌈 Background */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* 🧊 Main Container */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* ✨ Fade Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🧾 Headings */
+h1, h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* 📥 Inputs */
+input {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  width: 180px;
+  transition: 0.3s;
+}
+
+/* ✨ Input focus */
+input:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #00f2ff;
+}
+
+/* 🔘 Buttons */
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00f2ff, #4facfe);
+  color: #000;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* 🔥 Button Hover */
+button:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+/* ❌ Delete Button */
+button:nth-child(2) {
+  background: linear-gradient(135deg, #ff6a6a, #ff0000);
+  color: white;
+}
+
+button:nth-child(2):hover {
+  background: linear-gradient(135deg, #ff0000, #ff6a6a);
+}
+
+/* 📋 Employee Card */
+.employee-card {
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+  animation: slideIn 0.5s ease;
+}
+
+/* ✨ Slide animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 🧠 Card hover */
+.employee-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 🔍 Search input full width */
+.search {
+  width: 95%;
+}
+
+/* 📱 Responsive */
+@media (max-width: 600px) {
+  input {
+    width: 100%;
+  }
+
+  .employee-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
