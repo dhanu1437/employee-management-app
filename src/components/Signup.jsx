@@ -5,19 +5,43 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignup = async () => {
-    const { error } = await supabase.auth.signUp({ email, password });
+ const handleSignup = async (e) => {
+  e.preventDefault();
 
-    if (error) alert(error.message);
-    else alert("Signup successful!");
-  };
+  console.log("EMAIL:", email);
+  console.log("PASSWORD:", password);
 
+  if (!email || !password) {
+    return alert("Email and Password are required");
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) alert(error.message);
+  else alert("Signup successful!");
+};
   return (
-    <>
+    <form onSubmit={handleSignup}>
       <h2>Signup</h2>
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={handleSignup}>Signup</button>
-    </>
+
+      <input
+  type="email"
+  value={email}
+  placeholder="Email"
+  onChange={(e) => setEmail(e.target.value)}
+/>
+
+<input
+  type="password"
+  value={password}
+  placeholder="Password"
+  onChange={(e) => setPassword(e.target.value)}
+/>
+
+      <button type="submit">Signup</button>
+    </form>
   );
 }

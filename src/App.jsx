@@ -15,47 +15,70 @@ export default function App() {
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
 
-  // ---------- AUTH ----------
+  // ================= AUTH =================
   useEffect(() => {
+    // 🔥 Handles OAuth redirect session (VERY IMPORTANT)
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
     });
 
+    // 🔥 Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => setUser(session?.user ?? null)
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
     );
 
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // ---------- FETCH EMPLOYEES ----------
+  // ================= SAVE USER =================
+  useEffect(() => {
+    if (user) {
+      saveUser(user);
+    }
+  }, [user]);
+
+  async function saveUser(user) {
+    if (!user) return;
+
+    await supabase.from("users").upsert({
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.full_name || user.email,
+    });
+  }
+
+  // ================= FETCH EMPLOYEES =================
   useEffect(() => {
     if (user) fetchEmployees();
   }, [user, search]);
 
   async function fetchEmployees() {
-    let query = supabase.from("employees_table").select("*"); // updated table name
+    let query = supabase.from("employees_table").select("*");
+
     if (search) {
       query = query.or(`name.ilike.%${search}%,role.ilike.%${search}%`);
     }
+
     const { data, error } = await query;
+
     if (!error) setEmployees(data || []);
   }
 
-  // ---------- REALTIME SUBSCRIPTION ----------
+  // ================= REALTIME =================
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
-      .channel("employees_table_realtime") // channel name
+      .channel("employees_table_realtime")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "employees_table" }, // exact table name
+        { event: "*", schema: "public", table: "employees_table" },
         (payload) => {
           const { eventType, new: newRow, old: oldRow } = payload;
 
           if (eventType === "INSERT" && newRow) {
-            // Add row if it matches current search
             if (
               !search ||
               newRow.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,35 +106,36 @@ export default function App() {
     return () => supabase.removeChannel(channel);
   }, [user, search]);
 
-  // ---------- ADD EMPLOYEE ----------
+  // ================= ADD =================
   async function addEmployee() {
-    if (!name || !role || !salary) return alert("All fields required");
+    if (!name || !role || !salary) {
+      return alert("All fields required");
+    }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("employees_table")
-      .insert([{ name, role, salary }])
-      .select(); // returns inserted row
+      .insert([{ name, role, salary }]);
 
-    if (!error && data?.length) {
-      setEmployees((prev) => [...prev, data[0]]);
+    if (!error) {
       setName("");
       setRole("");
       setSalary("");
     }
   }
 
-  // ---------- UPDATE EMPLOYEE ----------
+  // ================= UPDATE =================
   async function updateEmployee() {
     const { data, error } = await supabase
       .from("employees_table")
       .update({ name, role, salary })
       .eq("id", editId)
-      .select(); // returns updated row
+      .select();
 
     if (!error && data?.length) {
       setEmployees((prev) =>
         prev.map((emp) => (emp.id === editId ? data[0] : emp))
       );
+
       setEditId(null);
       setName("");
       setRole("");
@@ -119,7 +143,7 @@ export default function App() {
     }
   }
 
-  // ---------- DELETE EMPLOYEE ----------
+  // ================= DELETE =================
   async function deleteEmployee(id) {
     const { error } = await supabase
       .from("employees_table")
@@ -131,13 +155,14 @@ export default function App() {
     }
   }
 
+  // ================= UI =================
   return (
     <div className="container">
       {!user ? (
         <>
           <h1>Welcome</h1>
           <Signup />
-          <Login setUser={setUser} />
+          <Login />
         </>
       ) : (
         <>
@@ -176,7 +201,7 @@ export default function App() {
 
           <hr />
 
-          {/* EMPLOYEE LIST */}
+          {/* LIST */}
           {employees.length === 0 ? (
             <p>No employees found</p>
           ) : (

@@ -1,26 +1,25 @@
-import { useState } from "react";
 import { supabase } from "../supabaseClient";
 
-export default function Login({ setUser }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Login() {
 
-  const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin // ✅ IMPORTANT FIX
+      }
     });
 
     if (error) alert(error.message);
-    else setUser(data.user);
   };
 
   return (
     <>
       <h2>Login</h2>
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={handleLogin}>Login</button>
+
+      <button onClick={handleGoogleLogin}>
+        Sign in with Google
+      </button>
     </>
   );
 }
